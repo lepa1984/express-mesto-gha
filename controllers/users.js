@@ -6,14 +6,13 @@ module.exports.getUsers = (req, res) => {
       res.send(users);
     })
     .catch(() => {
-      res
-        .status(500)
-        .send({ message: 'Не удалось получить список пользователей' });
+      res.status(500).send({
+        message: 'Не удалось получить список пользователей',
+      });
     });
 };
-
 module.exports.getUserById = (req, res) => {
-  User.findById({ _id: req.params.userId })
+  User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
         res.status(404).send({ message: 'Id пользователя не найден' });
@@ -21,44 +20,48 @@ module.exports.getUserById = (req, res) => {
       }
       res.send(user);
     })
-    .catch(() => {
-      if (!req.params.userId.isValid) {
+    .catch((err) => {
+      if (err.name === 'CastError') {
         res.status('400').send({ message: 'Incorrect Id number' });
       } else {
-        res
-          .status(500)
-          .send({ message: 'Ошибка получения данных пользователя' });
+        res.status(500).send({
+          message: 'Ошибка получения данных пользователя',
+        });
       }
     });
 };
-
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
     .then((user) => {
       res.send(user);
     })
-    // eslint-disable-next-line consistent-return
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status('400').send({
           message: 'Переданы некорректные данные при создании пользователя',
         });
-      } 
-        res.status(500).send({ message: 'Ошибка при создании пользователя' });
+      }
+      res.status(500).send({
+        message: 'Ошибка при создании пользователя',
+      });
     });
 };
-
 module.exports.updateUserInfo = (req, res) => {
-  User.findByIdAndUpdate(req.user._id, req.body, {
-    new: true,
-    runValidators: true,
-  })
+  const { name, about } = req.body;
+  User.findByIdAndUpdate(
+    req.user._id,
+    { name, about },
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
     .then((user) => {
       if (!user) {
-        res
-          .status(404)
-          .send({ message: 'Информация о пользователе не найдена' });
+        res.status(404).send({
+          message: 'Информация о пользователе не найдена',
+        });
         return;
       }
       res.send(user);
@@ -74,17 +77,20 @@ module.exports.updateUserInfo = (req, res) => {
         .send({ message: 'Ошибка обновления данных пользователя' });
     });
 };
-
 module.exports.updateAvatar = (req, res) => {
-  User.findByIdAndUpdate(req.user._id, req.body, {
-    runValidators: true,
-    new: true,
-  })
+  const { avatar } = req.body;
+  User.findByIdAndUpdate(
+    req.user._id,
+    { avatar },
+    {
+      new: true,
+    },
+  )
     .then((user) => {
       if (!user) {
-        res
-          .status(404)
-          .send({ message: 'Пользователь по указанному ID не найден' });
+        res.status(404).send({
+          message: 'Пользователь по указанному ID не найден',
+        });
         return;
       }
       res.send(user);
