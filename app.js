@@ -18,7 +18,7 @@ app.use((req, res, next) => {
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
 app.use('*', (req, res, next) => {
-  res.status(400).send({ message: 'Запрошен несуществующий роут' });
+  res.status(404).send({ message: 'Запрошен несуществующий роут' });
   next();
 });
 app.listen(PORT, () => {
