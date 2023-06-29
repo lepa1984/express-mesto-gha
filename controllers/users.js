@@ -22,7 +22,7 @@ module.exports.getUserById = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status('400').send({ message: 'Incorrect Id number' });
+          res.status(400).send({ message: 'Пользователь с указанным _id не найден' });
       } else {
         res.status(500).send({
           message: 'Ошибка получения данных пользователя',
