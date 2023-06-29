@@ -38,14 +38,14 @@ module.exports.createUser = (req, res) => {
     .then((user) => {
       res.send(user);
     })
+    // eslint-disable-next-line consistent-return
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status('400').send({
           message: 'Переданы некорректные данные при создании пользователя',
         });
-      } else {
+      } 
         res.status(500).send({ message: 'Ошибка при создании пользователя' });
-      }
     });
 };
 
