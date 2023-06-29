@@ -33,7 +33,7 @@ const getUserById = (req, res) => {
         res.status(404).send({ message: 'Пользователь по указанному _id не найден' });
         return;
       }
-        res.status(200).send(user);
+      res.send(user);
     })
     .catch((error) => {
       if (error.name === 'CastError') {
@@ -51,7 +51,7 @@ const updateUserInfo = (req, res) => {
         res.status(404).send({ message: 'Пользователь с указанным _id не найден' });
         return;
       }
-      res.send(user);
+      res.status(200).send(user);
     })
     .catch((error) => {
       if (error.name === 'ValidationError') {
