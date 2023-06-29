@@ -1,4 +1,4 @@
-const User = require("../models/user");
+const User = require('../models/user');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
@@ -8,7 +8,7 @@ module.exports.getUsers = (req, res) => {
     .catch(() => {
       res
         .status(500)
-        .send({ message: "Не удалось получить список пользователей" });
+        .send({ message: 'Не удалось получить список пользователей' });
     });
 };
 
@@ -16,18 +16,18 @@ module.exports.getUserById = (req, res) => {
   User.findById({ _id: req.params.userId })
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: "Id пользователя не найден" });
+        res.status(404).send({ message: 'Id пользователя не найден' });
         return;
       }
       res.send(user);
     })
     .catch(() => {
       if (!req.params.userId.isValid) {
-        res.status("400").send({ message: "Incorrect Id number" });
+        res.status('400').send({ message: 'Incorrect Id number' });
       } else {
         res
           .status(500)
-          .send({ message: "Ошибка получения данных пользователя" });
+          .send({ message: 'Ошибка получения данных пользователя' });
       }
     });
 };
@@ -39,12 +39,12 @@ module.exports.createUser = (req, res) => {
       res.send(user);
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        return res.status("400").send({
-          message: "Переданы некорректные данные при создании пользователя",
+      if (err.name === 'ValidationError') {
+        return res.status('400').send({
+          message: 'Переданы некорректные данные при создании пользователя',
         });
       } else {
-        res.status(500).send({ message: "Ошибка при создании пользователя" });
+        res.status(500).send({ message: 'Ошибка при создании пользователя' });
       }
     });
 };
@@ -58,20 +58,20 @@ module.exports.updateUserInfo = (req, res) => {
       if (!user) {
         res
           .status(404)
-          .send({ message: "Информация о пользователе не найдена" });
+          .send({ message: 'Информация о пользователе не найдена' });
         return;
       }
       res.send(user);
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err.name === 'ValidationError') {
         return res.status(400).send({
-          message: "Переданы некорректные данные при обновлении профиля",
+          message: 'Переданы некорректные данные при обновлении профиля',
         });
       }
       return res
         .status(500)
-        .send({ message: "Ошибка обновления данных пользователя" });
+        .send({ message: 'Ошибка обновления данных пользователя' });
     });
 };
 
@@ -84,19 +84,19 @@ module.exports.updateAvatar = (req, res) => {
       if (!user) {
         res
           .status(404)
-          .send({ message: "Пользователь по указанному ID не найден" });
+          .send({ message: 'Пользователь по указанному ID не найден' });
         return;
       }
       res.send(user);
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        return res.status("400").send({
-          message: "Переданы некорректные данные при обновлении аватара",
+      if (err.name === 'ValidationError') {
+        return res.status('400').send({
+          message: 'Переданы некорректные данные при обновлении аватара',
         });
       }
       return res
         .status(500)
-        .send({ message: "Ошибка обновления аватара пользователя" });
+        .send({ message: 'Ошибка обновления аватара пользователя' });
     });
 };

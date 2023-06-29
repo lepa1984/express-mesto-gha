@@ -1,4 +1,4 @@
-const Card = require("../models/card");
+const Card = require('../models/card');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
@@ -6,7 +6,7 @@ module.exports.getCards = (req, res) => {
       res.send(cards);
     })
     .catch(() => {
-      res.status(500).send({ message: "Список карточек не получен" });
+      res.status(500).send({ message: 'Список карточек не получен' });
     });
 };
 
@@ -18,12 +18,12 @@ module.exports.createCard = (req, res) => {
       res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err.name === 'ValidationError') {
         return res.status(400).send({
-          message: "Переданы некорректные данные при создании карточки",
+          message: 'Переданы некорректные данные при создании карточки',
         });
       }
-      return res.status(500).send({ message: "Ошибка при создании карточки" });
+      return res.status(500).send({ message: 'Ошибка при создании карточки' });
     });
 };
 
@@ -31,15 +31,15 @@ module.exports.deleteCard = (req, res) => {
   Card.findOneAndDelete({ _id: req.params.cardId })
     .then((card) => {
       if (!card) {
-        return res.status(404).send({ message: "Карточка не найдена" });
+        return res.status(404).send({ message: 'Карточка не найдена' });
       }
       return res.send(card);
     })
     .catch(() => {
       if (!req.params.cardId.isValid) {
-        res.status(400).send({ message: "Некорректный ID карточки" });
+        res.status(400).send({ message: 'Некорректный ID карточки' });
       } else {
-        res.status(500).send({ message: "Ошибка при удалении карточки" });
+        res.status(500).send({ message: 'Ошибка при удалении карточки' });
       }
     });
 };
@@ -54,17 +54,17 @@ module.exports.likeCard = (req, res) => {
       if (!card) {
         return res
           .status(404)
-          .send({ message: "Карточка с указанным ID не найдена" });
+          .send({ message: 'Карточка с указанным ID не найдена' });
       }
       return res.send(card);
     })
     .catch(() => {
       if (!req.params.cardId.isValid) {
-        res.status(400).send({ message: "Некорректный ID" });
+        res.status(400).send({ message: 'Некорректный ID' });
       } else {
         res
           .status(500)
-          .send({ message: "Ошибка при постановке лайка карточке" });
+          .send({ message: 'Ошибка при постановке лайка карточке' });
       }
     });
 };
@@ -79,13 +79,13 @@ module.exports.dislikeCard = (req, res) => {
       if (!card) {
         return res
           .status(400)
-          .send({ message: "Карточка с указанным ID не найдена" });
+          .send({ message: 'Карточка с указанным ID не найдена' });
       }
       return res.send(card);
     })
     .catch((err) => {
       if (!req.params.cardId.isValid) {
-        res.status(400).send({ message: "Некорректный ID" });
+        res.status(400).send({ message: 'Некорректный ID' });
       } else {
         res.status(500).send({ message: err.message });
       }
