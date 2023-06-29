@@ -1,9 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const app = express();
-mongoose.connect('mongodb://127.0.0.1/mestodb');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
+
+const app = express();
+mongoose.connect('mongodb://127.0.0.1/mestodb');
 const { PORT = 3000 } = process.env;
 app.use(express.json());
 app.use((req, res, next) => {
