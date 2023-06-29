@@ -31,7 +31,6 @@ const getUserById = (req, res) => {
     .then((user) => {
       if (!user) {
         res.status(404).send({ message: 'Пользователь по указанному _id не найден' });
-        return;
       }
       res.status(200).send(user);
     })
@@ -49,7 +48,6 @@ const updateUserInfo = (req, res) => {
     .then((user) => {
       if (!user) {
         res.status(404).send({ message: 'Пользователь с указанным _id не найден' });
-        return;
       }
       res.status(200).send(user);
     })
@@ -69,7 +67,6 @@ const updateAvatar = (req, res) => {
     .then((user) => {
       if (!user) {
         res.status(404).send({ message: 'Пользователь с указанным _id не найден' });
-        return;
       }
       res.status(200).send(user);
     })
