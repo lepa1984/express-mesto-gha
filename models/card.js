@@ -25,7 +25,4 @@ const cardSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
-
-const User = mongoose.model('card', cardSchema);
-
-module.exports = User;
+module.exports = mongoose.model('card', cardSchema);
