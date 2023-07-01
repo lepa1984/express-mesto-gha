@@ -32,7 +32,7 @@ const getUserById = (req, res) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        res.status(NOT_FOUND_ERROR).send({ message: 'Пользователь по указанному _id не найден' });
+        return res.status(NOT_FOUND_ERROR).send({ message: 'Пользователь по указанному _id не найден' });
       }
       return res.send(user);
     })
@@ -49,7 +49,7 @@ const updateUserInfo = (req, res) => {
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        res.status(NOT_FOUND_ERROR).send({ message: 'Пользователь с указанным _id не найден' });
+        return res.status(NOT_FOUND_ERROR).send({ message: 'Пользователь с указанным _id не найден' });
       }
       return res.send(user);
     })
@@ -68,7 +68,7 @@ const updateAvatar = (req, res) => {
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true })
     .then((user) => {
       if (!user) {
-        res.status(NOT_FOUND_ERROR).send({ message: 'Пользователь с указанным _id не найден' });
+        return res.status(NOT_FOUND_ERROR).send({ message: 'Пользователь с указанным _id не найден' });
       }
       return res.send(user);
     })
