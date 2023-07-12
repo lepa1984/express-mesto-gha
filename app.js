@@ -1,25 +1,29 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const userRouter = require('./routes/users');
-const cardRouter = require('./routes/cards');
+const router = require('./routes/router');
+const helmet = require('helmet');
+const { errors } = require('celebrate');
+const errorHandler = require('./middlewares/error-handler');
 
-const app = express();
-mongoose.connect('mongodb://127.0.0.1/mestodb');
 const { PORT = 3000 } = process.env;
-app.use(express.json());
-app.use((req, res, next) => {
-  req.user = {
-    _id: '649d8bf3faf805a03fa9c8d1',
-  };
+const app = express();
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use(limiter);
+app.use(helmet());
 
-  next();
-});
-app.use('/users', userRouter);
-app.use('/cards', cardRouter);
-app.use('*', (req, res, next) => {
-  res.status(404).send({ message: 'Запрошен несуществующий роут' });
-  next();
-});
+mongoose.set('debug', true);
+mongoose.connect('mongodb://127.0.0.1/mestodb');
+
+app.use(express.json());
+app.use(router);
+app.use(errors());
+app.use(errorHandler);
+
 app.listen(PORT, () => {
   console.log(`Сервер запущен! Порт: ${PORT}`);
 });
