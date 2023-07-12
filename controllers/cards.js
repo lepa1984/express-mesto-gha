@@ -17,6 +17,7 @@ const createCard = (req, res) => {
           )
         );
       } else {
+        // eslint-disable-next-line no-undef
         next(error);
       }
     });
@@ -26,7 +27,7 @@ const getCards = (req, res) => {
   Card.find({})
     .then((cards) => {
       res.send(cards);
-    })
+    }) // eslint-disable-next-line no-undef
     .catch(next);
 };
 
@@ -34,16 +35,18 @@ const deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (!card) {
+        // eslint-disable-next-line no-undef
         next(new NotFoundError('Карточка с указанным _id не найдена'));
       }
       if (req.user.id !== card.owner.toString()) {
+        // eslint-disable-next-line no-undef
         next(new NotUserError('Нельзя удалять чужие карточки.'));
       } else {
-        Card.deleteOne(card).then(() => {
-          return res.send({ message: 'Карточка удалена.' });
-        });
+        Card.deleteOne(card).then(() =>
+          res.send({ message: 'Карточка удалена.' })
+        );
       }
-    })
+    }) // eslint-disable-next-line no-undef
     .catch(next);
 };
 
@@ -57,8 +60,10 @@ const likeCard = (req, res) => {
     .then((card) => res.send(card))
     .catch((error) => {
       if (error.name === 'CastError') {
+        // eslint-disable-next-line no-undef
         next(new BadRequestError('Переданы некорректные данные для лайка'));
       } else {
+        // eslint-disable-next-line no-undef
         next(error);
       }
     });

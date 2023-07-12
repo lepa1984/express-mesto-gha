@@ -1,6 +1,6 @@
 const { celebrate, Joi } = require('celebrate');
 
-const signupValidator = celebrate({
+const validCreateUser = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
@@ -16,7 +16,7 @@ const signupValidator = celebrate({
   }),
 });
 
-const signinValidator = celebrate({
+const validLogin = celebrate({
   body: Joi.object().keys({
     email: Joi.string()
       .required()
@@ -62,8 +62,7 @@ const cardIdValidator = celebrate({
 });
 
 module.exports = {
-  signupValidator,
-  signinValidator,
+  validLogin, validCreateUser,
   userUpdateValidator,
   userAvatarValidator,
   userIdValidator,

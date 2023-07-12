@@ -1,11 +1,6 @@
-const User = require('../models/user');
-const {
-  BAD_REQUEST_ERROR,
-  NOT_FOUND_ERROR,
-  INTERNAL_SERVER_ERROR,
-} = require('../utils/constants');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 const BadRequestError = require('../errors/BadRequest');
 const NotFoundError = require('../errors/NotFound');
 const ConflictError = require('../errors/ConflictError');
@@ -35,12 +30,14 @@ const createUser = (req, res) => {
     })
     .catch((error) => {
       if (error.code === 11000) {
+        // eslint-disable-next-line no-undef
         next(
           new ConflictError('Пользователь с таким email уже зарегистрирован')
         );
         return;
       }
       if (error.name === 'ValidationError') {
+        // eslint-disable-next-line no-undef
         next(
           new BadRequestError(
             'Переданы некорректные данные при создании пользователя'
@@ -48,6 +45,7 @@ const createUser = (req, res) => {
         );
         return;
       }
+      // eslint-disable-next-line no-undef
       next(error);
     });
 };
@@ -80,13 +78,13 @@ const login = (req, res, next) => {
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => {
+      if (!users) {
+        throw new NotFoundError('Not found');
+      }
       res.send(users);
     })
-    .catch(() => {
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: 'На сервере произошла ошибка' });
-    });
+    // eslint-disable-next-line no-undef
+    .catch(next);
 };
 
 const getUserById = (req, res) => {
@@ -94,21 +92,18 @@ const getUserById = (req, res) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        return res
-          .status(NOT_FOUND_ERROR)
-          .send({ message: 'Пользователь по указанному _id не найден' });
+        // eslint-disable-next-line no-undef
+        return next(new NotFoundError('Нет пользователя с таким id'));
       }
       return res.send(user);
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        res
-          .status(BAD_REQUEST_ERROR)
-          .send({ message: 'Пользователь с указанным _id не найден' });
+        // eslint-disable-next-line no-undef
+        next(new BadRequestError('Некорректные данные пользователя'));
       } else {
-        res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: 'На сервере произошла ошибка' });
+        // eslint-disable-next-line no-undef
+        next(error);
       }
     });
 };
@@ -121,21 +116,22 @@ const updateUserInfo = (req, res) => {
   )
     .then((user) => {
       if (!user) {
-        return res
-          .status(NOT_FOUND_ERROR)
-          .send({ message: 'Пользователь с указанным _id не найден' });
+        // eslint-disable-next-line no-undef
+        return next(new NotFoundError('Нет пользователя с таким id'));
       }
       return res.send(user);
     })
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        res.status(BAD_REQUEST_ERROR).send({
-          message: 'Переданы некорректные данные при обновлении профиля',
-        });
+        // eslint-disable-next-line no-undef
+        next(
+          new BadRequestError(
+            'Переданы некорректные данные при обновлении профиля'
+          )
+        );
       } else {
-        res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: 'На сервере произошла ошибка' });
+        // eslint-disable-next-line no-undef
+        next(error);
       }
     });
 };
@@ -143,35 +139,50 @@ const updateUserInfo = (req, res) => {
 const updateAvatar = (req, res) => {
   const { avatar } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true })
+  User.findByIdAndUpdate(
+    req.user._id,
+    { avatar },
+    { new: true, runValidators: true }
+  )
     .then((user) => {
       if (!user) {
-        return res
-          .status(NOT_FOUND_ERROR)
-          .send({ message: 'Пользователь с указанным _id не найден' });
+        // eslint-disable-next-line no-undef
+        return next(new NotFoundError('Нет пользователя с таким id'));
       }
       return res.send(user);
     })
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        res.status(BAD_REQUEST_ERROR).send({
-          message: 'Переданы некорректные данные при обновлении аватара',
-        });
+        // eslint-disable-next-line no-undef
+        next(
+          new BadRequestError(
+            'Переданы некорректные данные при обновлении профиля'
+          )
+        );
       } else {
-        res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: 'На сервере произошла ошибка' });
+        // eslint-disable-next-line no-undef
+        next(error);
       }
     });
 };
 const getUserInfo = (req, res, next) => {
-  User.findById(req.user._id)
-    .orFail(() => {
-      throw new NotFoundError('Пользователь не найден');
+  const { userId } = req.params;
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        // eslint-disable-next-line no-undef
+        return next(new NotFoundError('Нет пользователя с таким id'));
+      }
+      return res.send(user);
     })
-    .then((data) => res.send({ data }))
-    .catch((err) => {
-      next(err);
+    .catch((error) => {
+      if (error.name === 'CastError') {
+        // eslint-disable-next-line no-undef
+        next(new BadRequestError('Некорректные данные пользователя'));
+      } else {
+        // eslint-disable-next-line no-undef
+        next(error);
+      }
     });
 };
 module.exports = {
