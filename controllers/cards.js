@@ -11,6 +11,7 @@ const createCard = (req, res) => {
     .then((card) => res.send(card))
     .catch((error) => {
       if (error.name === 'ValidationError') {
+        // eslint-disable-next-line no-undef
         next(
           new BadRequestError(
             'Переданы некорректные данные при создании карточки.'
@@ -46,8 +47,20 @@ const deleteCard = (req, res) => {
           res.send({ message: 'Карточка удалена.' })
         );
       }
-    }) // eslint-disable-next-line no-undef
-    .catch(next);
+    })
+    .catch((error) => {
+      if (error.name === 'CastError') {
+        // eslint-disable-next-line no-undef
+        next(
+          new BadRequestError(
+            'Переданы некорректные данные при удалении карточки'
+          )
+        );
+      } else {
+        // eslint-disable-next-line no-undef
+        next(error);
+      }
+    });
 };
 
 const likeCard = (req, res) => {
@@ -77,16 +90,19 @@ const dislikeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
+        // eslint-disable-next-line no-undef
         next(new NotFoundError('Карточка не найдена.'));
       }
       return res.send({ card, message: 'Лайк удален' });
     })
     .catch((error) => {
       if (error.name === 'CastError') {
+        // eslint-disable-next-line no-undef
         next(
           new BadRequestError('Переданы некорректные данные при удалении лайка')
         );
       } else {
+        // eslint-disable-next-line no-undef
         next(error);
       }
     });

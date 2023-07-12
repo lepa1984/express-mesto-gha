@@ -77,14 +77,9 @@ const login = (req, res, next) => {
 
 const getUsers = (req, res) => {
   User.find({})
-    .then((users) => {
-      if (!users) {
-        throw new NotFoundError('Not found');
-      }
-      res.send(users);
-    })
+    .then((users) => res.send(users))
     // eslint-disable-next-line no-undef
-    .catch(next);
+    .catch((error) => next(error));
 };
 
 const getUserById = (req, res) => {
