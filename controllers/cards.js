@@ -43,9 +43,9 @@ const deleteCard = (req, res) => {
         // eslint-disable-next-line no-undef
         next(new NotUserError('Нельзя удалять чужие карточки.'));
       } else {
-        Card.deleteOne(card).then(() =>
-          res.send({ message: 'Карточка удалена.' })
-        );
+        Card.deleteOne(card).then((foundCard) => {
+          res.send({ foundCard });
+        });
       }
     })
     .catch((error) => {
