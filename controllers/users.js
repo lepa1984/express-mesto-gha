@@ -7,11 +7,12 @@ const ConflictError = require('../errors/ConflictError');
 const AuthError = require('../errors/AuthError');
 
 const createUser = (req, res, next) => {
+  // eslint-disable-next-line object-curly-newline
   const { name, about, avatar, email, password } = req.body;
-
   bcrypt
     .hash(password, 10)
     .then((hash) =>
+      // eslint-disable-next-line implicit-arrow-linebreak
       User.create({
         email,
         password: hash,
@@ -20,8 +21,8 @@ const createUser = (req, res, next) => {
         avatar,
       })
     )
-    .then((user) => {
-      res.status(201).send(user);
+    .then(() => {
+      res.status(201).send({ name, about, avatar, email });
     })
     .catch((error) => {
       if (error.name === 'ValidationError') {
@@ -36,10 +37,8 @@ const createUser = (req, res, next) => {
         next(
           new ConflictError('Пользователь с таким email уже зарегистрирован')
         );
-      } else {
-        // eslint-disable-next-line no-undef
-        next(error);
       }
+      return next(error);
     });
 };
 
@@ -59,15 +58,12 @@ const login = (req, res, next) => {
         const token = jwt.sign({ id: user._id }, 'unique-secret-key', {
           expiresIn: '7d',
         });
-        return res
-          .cookie('token', token, {
-            maxAge: 3600000 * 24 * 7,
-            httpOnly: true,
-          })
-          .send(user);
+        return res.send({ token });
       });
     })
-    .catch(next);
+    .catch((error) => {
+      next(error);
+    });
 };
 
 const getUsers = (req, res, next) => {
@@ -75,11 +71,14 @@ const getUsers = (req, res, next) => {
     .then((users) => {
       res.send(users);
     })
-    .catch(next);
+    .catch((error) => {
+      next(error);
+    });
 };
 
 const getUserById = (req, res, next) => {
-  User.findById(req.params.userId)
+  const { userId } = req.params;
+  User.findById(userId)
     .then((user) => {
       if (!user) {
         // eslint-disable-next-line no-undef

@@ -8,6 +8,7 @@ const errorHandler = require('./middlewares/error-handler');
 
 const { PORT = 3000 } = process.env;
 const app = express();
+mongoose.connect('mongodb://127.0.0.1/mestodb');
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -17,9 +18,6 @@ const limiter = rateLimit({
 app.use(express.json());
 app.use(limiter);
 app.use(helmet());
-
-mongoose.set('debug', true);
-mongoose.connect('mongodb://127.0.0.1/mestodb');
 
 app.use(express.json());
 app.use(routers);
