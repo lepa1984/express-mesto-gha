@@ -14,14 +14,15 @@ const limiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+app.use(express.json());
 app.use(limiter);
 app.use(helmet());
 
 mongoose.set('debug', true);
 mongoose.connect('mongodb://127.0.0.1/mestodb');
-app.use(routers);
-app.use(express.json());
 
+app.use(express.json());
+app.use(routers);
 app.use(errors());
 app.use(errorHandler);
 

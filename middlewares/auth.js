@@ -5,7 +5,6 @@ const AuthError = require('../errors/AuthError');
 module.exports = (req, res, next) => {
   // Там токен
   const { authorization } = req.headers;
-  if (!authorization) return next(new AuthError('Необходима авторизация'));
   const token = authorization.replace('Bearer ', '');
   let payload;
   try {
@@ -14,5 +13,5 @@ module.exports = (req, res, next) => {
     return next(new AuthError('Необходима авторизация'));
   }
   req.user = payload;
-  return next();
+  next();
 };

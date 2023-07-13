@@ -4,7 +4,7 @@ const User = require('../models/user');
 const BadRequestError = require('../errors/BadRequest');
 const NotFoundError = require('../errors/NotFound');
 const ConflictError = require('../errors/ConflictError');
-const UnauthorizedError = require('../errors/AuthError');
+const AuthError = require('../errors/AuthError');
 
 const createUser = (req, res) => {
   const { name, about, avatar, email, password } = req.body;
@@ -20,13 +20,8 @@ const createUser = (req, res) => {
         avatar,
       })
     )
-    .then(() => {
-      res.send({
-        name,
-        about,
-        email,
-        avatar,
-      });
+    .then((user) => {
+      res.send(user);
     })
     .catch((error) => {
       if (error.code === 11000) {
@@ -54,13 +49,14 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findOne({ email })
     .select('+password')
+    .orFail(() => next(new AuthError('Неправильные почта или пароль')))
     .then((user) => {
       if (!user) {
-        throw new UnauthorizedError('Неправильные почта или пароль');
+        throw new AuthError('Неправильные почта или пароль');
       }
       return bcrypt.compare(password, user.password).then((matched) => {
         if (!matched) {
-          throw new UnauthorizedError('Неправильные почта или пароль');
+          throw new AuthError('Неправильные почта или пароль');
         }
         const token = jwt.sign({ id: user._id }, 'unique-secret-key', {
           expiresIn: '7d',
@@ -71,22 +67,22 @@ const login = (req, res, next) => {
     .catch(next);
 };
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
-    .then((users) => res.send(users))
-    // eslint-disable-next-line no-undef
-    .catch((error) => next(error));
+    .then((users) => {
+      res.send(users);
+    })
+    .catch(next);
 };
 
 const getUserById = (req, res) => {
-  const { userId } = req.params;
-  User.findById(userId)
+  User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
         // eslint-disable-next-line no-undef
         return next(new NotFoundError('Нет пользователя с таким id'));
       }
-      return res.status(200).send(user);
+      return res.send(user);
     })
     .catch((error) => {
       if (error.name === 'CastError') {
@@ -99,16 +95,15 @@ const getUserById = (req, res) => {
     });
 };
 const updateUserInfo = (req, res) => {
-  const { name, about, email, password } = req.body;
+  const { name, about } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
-    { name, about, email, password },
+    { name, about },
     { new: true, runValidators: true }
   )
     .then((user) => {
       if (!user) {
-        // eslint-disable-next-line no-undef
-        return next(new NotFoundError('Нет пользователя с таким id'));
+        throw new NotFoundError('Нет пользователя с таким id');
       }
       return res.send(user);
     })
@@ -130,15 +125,10 @@ const updateUserInfo = (req, res) => {
 const updateAvatar = (req, res) => {
   const { avatar } = req.body;
 
-  User.findByIdAndUpdate(
-    req.user._id,
-    { avatar },
-    { new: true, runValidators: true }
-  )
+  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true })
     .then((user) => {
       if (!user) {
-        // eslint-disable-next-line no-undef
-        return next(new NotFoundError('Нет пользователя с таким id'));
+        throw new NotFoundError('Нет пользователя с таким id');
       }
       return res.send(user);
     })
@@ -161,8 +151,7 @@ const getUserInfo = (req, res, next) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        // eslint-disable-next-line no-undef
-        return next(new NotFoundError('Нет пользователя с таким id'));
+        throw new NotFoundError('Нет пользователя с таким id');
       }
       return res.send(user);
     })
