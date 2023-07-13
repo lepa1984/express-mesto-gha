@@ -21,7 +21,7 @@ const createUser = (req, res) => {
       })
     )
     .then((user) => {
-      res.send(user);
+      res.status(201).send(user);
     })
     .catch((error) => {
       if (error.code === 11000) {
@@ -29,7 +29,6 @@ const createUser = (req, res) => {
         next(
           new ConflictError('Пользователь с таким email уже зарегистрирован')
         );
-        return;
       }
       if (error.name === 'ValidationError') {
         // eslint-disable-next-line no-undef
@@ -61,12 +60,12 @@ const login = (req, res, next) => {
         const token = jwt.sign({ id: user._id }, 'unique-secret-key', {
           expiresIn: '7d',
         });
-        res.cookie('token', token, {
-          maxAge: 3600000 * 24 * 7,
-          httpOnly: true,
-          sameSite: true,
-        });
-        res.send(user);
+        return res
+          .cookie('token', token, {
+            maxAge: 3600000 * 24 * 7,
+            httpOnly: true,
+          })
+          .send(user);
       });
     })
     .catch(next);
