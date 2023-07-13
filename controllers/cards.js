@@ -33,17 +33,18 @@ const getCards = (req, res) => {
 };
 
 const deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.cardId)
+    .orFail()
     .then((card) => {
       if (!card) {
         // eslint-disable-next-line no-undef
         next(new NotFoundError('Карточка с указанным _id не найдена'));
-      } else if (req.user.id !== card.owner.toString()) {
+      } else if (req.user.id.toString() !== card.owner.toString()) {
         // eslint-disable-next-line no-undef
         next(new NotUserError('Нельзя удалять чужие карточки.'));
       } else {
-        Card.deleteOne(card).then((foundCard) => {
-          res.status(200).send({ foundCard });
+        Card.deleteOne(card).then(() => {
+          res.send({ message: 'Карточка удалена' });
         });
       }
     })
@@ -74,7 +75,7 @@ const likeCard = (req, res) => {
         // eslint-disable-next-line no-undef
         return next(new NotFoundError('Карточка с указанным _id не найдена'));
       }
-      return res.send(card);
+      return res.send({ message: 'Лайк' });
     })
     .catch((error) => {
       if (error.name === 'CastError') {
@@ -98,7 +99,7 @@ const dislikeCard = (req, res) => {
         // eslint-disable-next-line no-undef
         next(new NotFoundError('Карточка не найдена.'));
       }
-      return res.send(card);
+      return res.send({ message: 'Дизлайк' });
     })
     .catch((error) => {
       if (error.name === 'CastError') {

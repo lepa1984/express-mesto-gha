@@ -21,7 +21,7 @@ const createUser = (req, res) => {
       })
     )
     .then(() => {
-      res.status(201).send({
+      res.send({
         name,
         about,
         email,
@@ -56,15 +56,11 @@ const login = (req, res, next) => {
     .select('+password')
     .then((user) => {
       if (!user) {
-        return Promise.reject(
-          new UnauthorizedError('Неправильные почта или пароль')
-        );
+        throw new UnauthorizedError('Неправильные почта или пароль');
       }
       return bcrypt.compare(password, user.password).then((matched) => {
         if (!matched) {
-          return Promise.reject(
-            new UnauthorizedError('Неправильные почта или пароль')
-          );
+          throw new UnauthorizedError('Неправильные почта или пароль');
         }
         const token = jwt.sign({ id: user._id }, 'unique-secret-key', {
           expiresIn: '7d',
