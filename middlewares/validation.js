@@ -62,7 +62,8 @@ const cardIdValidator = celebrate({
 });
 
 module.exports = {
-  validLogin, validCreateUser,
+  validLogin,
+  validCreateUser,
   userUpdateValidator,
   userAvatarValidator,
   userIdValidator,

@@ -8,7 +8,7 @@ const createCard = (req, res) => {
   const owner = req.user._id;
 
   Card.create({ name, link, owner })
-    .then((card) => res.send(card))
+    .then((card) => res.status(201).send(card))
     .catch((error) => {
       if (error.name === 'ValidationError') {
         // eslint-disable-next-line no-undef
@@ -38,13 +38,12 @@ const deleteCard = (req, res) => {
       if (!card) {
         // eslint-disable-next-line no-undef
         next(new NotFoundError('Карточка с указанным _id не найдена'));
-      }
-      if (req.user.id !== card.owner.toString()) {
+      } else if (req.user.id !== card.owner.toString()) {
         // eslint-disable-next-line no-undef
         next(new NotUserError('Нельзя удалять чужие карточки.'));
       } else {
         Card.deleteOne(card).then((foundCard) => {
-          res.send({ foundCard });
+          res.status(200).send({ foundCard });
         });
       }
     })
@@ -70,7 +69,13 @@ const likeCard = (req, res) => {
     { new: true }
   )
     .orFail(() => new NotFoundError('Карточка не найдена.'))
-    .then((card) => res.send(card))
+    .then((card) => {
+      if (!card) {
+        // eslint-disable-next-line no-undef
+        return next(new NotFoundError('Карточка с указанным _id не найдена'));
+      }
+      return res.send(card);
+    })
     .catch((error) => {
       if (error.name === 'CastError') {
         // eslint-disable-next-line no-undef
@@ -93,7 +98,7 @@ const dislikeCard = (req, res) => {
         // eslint-disable-next-line no-undef
         next(new NotFoundError('Карточка не найдена.'));
       }
-      return res.send({ card, message: 'Лайк удален' });
+      return res.send(card);
     })
     .catch((error) => {
       if (error.name === 'CastError') {

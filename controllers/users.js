@@ -13,15 +13,15 @@ const createUser = (req, res) => {
     .hash(password, 10)
     .then((hash) =>
       User.create({
-        avatar,
-        about,
-        name,
         email,
         password: hash,
+        name,
+        about,
+        avatar,
       })
     )
     .then(() => {
-      res.send({
+      res.status(201).send({
         name,
         about,
         email,
@@ -43,10 +43,10 @@ const createUser = (req, res) => {
             'Переданы некорректные данные при создании пользователя'
           )
         );
-        return;
+      } else {
+        // eslint-disable-next-line no-undef
+        next(error);
       }
-      // eslint-disable-next-line no-undef
-      next(error);
     });
 };
 
@@ -66,10 +66,10 @@ const login = (req, res, next) => {
             new UnauthorizedError('Неправильные почта или пароль')
           );
         }
-        const token = jwt.sign({ id: user._id }, JWT_SECRET, {
+        const token = jwt.sign({ id: user._id }, 'unique-secret-key', {
           expiresIn: '7d',
         });
-        return res.send({ token });
+        return res.status(200).send({ token });
       });
     })
     .catch(next);
@@ -90,7 +90,7 @@ const getUserById = (req, res) => {
         // eslint-disable-next-line no-undef
         return next(new NotFoundError('Нет пользователя с таким id'));
       }
-      return res.send(user);
+      return res.status(200).send(user);
     })
     .catch((error) => {
       if (error.name === 'CastError') {
@@ -103,10 +103,10 @@ const getUserById = (req, res) => {
     });
 };
 const updateUserInfo = (req, res) => {
-  const { name, about } = req.body;
+  const { name, about, email, password } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
-    { name, about },
+    { name, about, email, password },
     { new: true, runValidators: true }
   )
     .then((user) => {
@@ -161,7 +161,7 @@ const updateAvatar = (req, res) => {
     });
 };
 const getUserInfo = (req, res, next) => {
-  const { userId } = req.params;
+  const { userId } = req.user._id;
   User.findById(userId)
     .then((user) => {
       if (!user) {
