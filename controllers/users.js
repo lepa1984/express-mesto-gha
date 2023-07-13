@@ -66,7 +66,7 @@ const login = (req, res, next) => {
           httpOnly: true,
           sameSite: true,
         });
-        res.send({ data: user.toJSON() });
+        res.send(user);
       });
     })
     .catch(next);
