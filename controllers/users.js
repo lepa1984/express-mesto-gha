@@ -6,7 +6,7 @@ const NotFoundError = require('../errors/NotFound');
 const ConflictError = require('../errors/ConflictError');
 const AuthError = require('../errors/AuthError');
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const { name, about, avatar, email, password } = req.body;
 
   bcrypt
@@ -24,18 +24,17 @@ const createUser = (req, res) => {
       res.status(201).send(user);
     })
     .catch((error) => {
-      if (error.code === 11000) {
-        // eslint-disable-next-line no-undef
-        next(
-          new ConflictError('Пользователь с таким email уже зарегистрирован')
-        );
-      }
       if (error.name === 'ValidationError') {
         // eslint-disable-next-line no-undef
         next(
           new BadRequestError(
             'Переданы некорректные данные при создании пользователя'
           )
+        );
+      } else if (error.code === 11000) {
+        // eslint-disable-next-line no-undef
+        next(
+          new ConflictError('Пользователь с таким email уже зарегистрирован')
         );
       } else {
         // eslint-disable-next-line no-undef
@@ -79,7 +78,7 @@ const getUsers = (req, res, next) => {
     .catch(next);
 };
 
-const getUserById = (req, res) => {
+const getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
@@ -98,7 +97,7 @@ const getUserById = (req, res) => {
       }
     });
 };
-const updateUserInfo = (req, res) => {
+const updateUserInfo = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
@@ -126,7 +125,7 @@ const updateUserInfo = (req, res) => {
     });
 };
 
-const updateAvatar = (req, res) => {
+const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true })
