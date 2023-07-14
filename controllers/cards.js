@@ -11,14 +11,12 @@ const createCard = (req, res, next) => {
     .then((card) => res.status(201).send(card))
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        // eslint-disable-next-line no-undef
         next(
           new BadRequestError(
             'Переданы некорректные данные при создании карточки.'
           )
         );
       } else {
-        // eslint-disable-next-line no-undef
         next(error);
       }
     });
@@ -28,30 +26,30 @@ const getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => {
       res.send(cards);
-    }) // eslint-disable-next-line no-undef
+    })
     .catch(next);
 };
 
 const deleteCard = (req, res, next) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Карточка не найдена.');
-      } else if (req.user.id.toString() !== card.owner.toString()) {
+      } else if (req.user._id !== card.owner.toString()) {
         throw new NotUserError('Нельзя удалять чужие карточки.');
       }
-      return res.send(card);
+      Card.deleteOne(card)
+        .then(() => res.send({ message: 'Карточка удалена' }))
+        .catch(next);
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        // eslint-disable-next-line no-undef
         next(
           new BadRequestError(
             'Переданы некорректные данные при удалении карточки'
           )
         );
       } else {
-        // eslint-disable-next-line no-undef
         next(error);
       }
     });
@@ -71,10 +69,8 @@ const likeCard = (req, res, next) => {
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        // eslint-disable-next-line no-undef
         next(new BadRequestError('Переданы некорректные данные для лайка'));
       } else {
-        // eslint-disable-next-line no-undef
         next(error);
       }
     });
@@ -94,12 +90,10 @@ const dislikeCard = (req, res, next) => {
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        // eslint-disable-next-line no-undef
         next(
           new BadRequestError('Переданы некорректные данные при удалении лайка')
         );
       } else {
-        // eslint-disable-next-line no-undef
         next(error);
       }
     });
