@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-// eslint-disable-next-line import/no-unresolved
+// eslint-disable-next-line import/no-unresolved, import/no-extraneous-dependencies
 const bcrypt = require('bcryptjs');
 const BadRequestError = require('../errors/BadRequest');
 const AuthError = require('../errors/AuthError');
