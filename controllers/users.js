@@ -139,8 +139,7 @@ const updateAvatar = (req, res, next) => {
     });
 };
 const getUserInfo = (req, res, next) => {
-  const { userId } = req.user._id;
-  User.findById(userId)
+  User.findById(req.user._id)
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Нет пользователя с таким id');
