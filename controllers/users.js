@@ -74,7 +74,7 @@ const getUsers = (req, res, next) => {
 };
 
 const getUserById = (req, res, next) => {
-  User.findById(req.params._id)
+  User.findById(req.params.id)
     .orFail(new Error('InvalidUserId'))
     .then((user) => {
       if (!user) {
