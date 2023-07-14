@@ -44,27 +44,17 @@ const createUser = (req, res, next) => {
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
-  return User.findOne({ email })
-    .select('+password')
-    .orFail(() => next(new AuthError('Неправильные почта или пароль')))
+  return User.findUserByCredentials(email, password)
     .then((user) => {
-      if (!user) {
-        throw new AuthError('Неправильные почта или пароль');
-      }
-      return bcrypt.compare(password, user.password).then((matched) => {
-        if (!matched) {
-          throw new AuthError('Неправильные почта или пароль');
-        }
-        const token = jwt.sign({ id: user._id }, 'unique-secret-key', {
-          expiresIn: '7d',
-        });
-        res
-          .cookie('jwt', token, {
-            maxAge: 3600000 * 24 * 7,
-            httpOnly: true,
-          })
-          .send({ token });
+      const token = jwt.sign({ _id: user._id }, 'unique-secret-key', {
+        expiresIn: '7d',
       });
+      res
+        .cookie('jwt', token, {
+          maxAge: 3600000 * 24 * 7,
+          httpOnly: true,
+        })
+        .send({ token });
     })
     .catch((error) => {
       next(error);
