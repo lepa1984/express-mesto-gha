@@ -32,8 +32,9 @@ const createUser = (req, res, next) => {
         next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
       } else if (error.code === 11000) {
         next(new ConflictError('Пользователь с таким email уже зарегистрирован'));
+      } else {
+        next(error);
       }
-      return next(error);
     });
 };
 
@@ -131,13 +132,7 @@ const getUserInfo = (req, res, next) => {
       }
       return res.send(user);
     })
-    .catch((error) => {
-      if (error.name === 'CastError') {
-        next(new BadRequestError('Некорректные данные пользователя'));
-      } else {
-        next(error);
-      }
-    });
+    .catch((error) => next(error));
 };
 module.exports = {
   getUsers,
