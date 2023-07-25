@@ -6,4 +6,5 @@ class AuthError extends Error {
     this.statusCode = AUTHORIZATION_ERROR;
   }
 }
+
 module.exports = AuthError;
